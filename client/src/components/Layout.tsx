@@ -9,7 +9,7 @@ interface LayoutProps {
 const NAV = [
   { path: "/", icon: "🏠", label: "Home" },
   { path: "/disease", icon: "🔬", label: "Disease" },
-  { path: "/chat", icon: "💬", label: "Chat" },
+  { path: "/market", icon: "🛒", label: "Mandi" },
   { path: "/transport", icon: "🚚", label: "Transport" },
   { path: "/profile", icon: "👤", label: "Profile" },
 ];

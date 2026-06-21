@@ -114,5 +114,54 @@ export async function migrate() {
     WHERE (SELECT COUNT(*) FROM transport_listings) < 5
   `);
 
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS market_listings (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      crop_name TEXT NOT NULL,
+      category TEXT DEFAULT 'vegetable',
+      quantity TEXT,
+      unit TEXT DEFAULT 'kg',
+      price REAL NOT NULL,
+      location TEXT DEFAULT 'India',
+      description TEXT,
+      image_data TEXT,
+      phone TEXT,
+      available BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+    )
+  `);
+
+  await db.execute(sql`
+    INSERT INTO market_listings (crop_name, category, quantity, unit, price, location, description, phone, available)
+    SELECT 'Tomato', 'vegetable', '500', 'kg', 18.50, 'Nashik, Maharashtra', 'Fresh hybrid tomatoes, just harvested. Bulk discount available.', '+91 98765 11111', true
+    WHERE NOT EXISTS (SELECT 1 FROM market_listings LIMIT 1)
+  `);
+  await db.execute(sql`
+    INSERT INTO market_listings (crop_name, category, quantity, unit, price, location, description, phone, available)
+    SELECT 'Wheat', 'grain', '20', 'quintal', 2150, 'Ludhiana, Punjab', 'High quality wheat, Grade A. MSP price or better.', '+91 98765 22222', true
+    WHERE (SELECT COUNT(*) FROM market_listings) < 2
+  `);
+  await db.execute(sql`
+    INSERT INTO market_listings (crop_name, category, quantity, unit, price, location, description, phone, available)
+    SELECT 'Alphonso Mango', 'fruit', '200', 'kg', 120, 'Ratnagiri, Maharashtra', 'GI-tagged Alphonso mangoes. Sweet, ripe and ready.', '+91 98765 33333', true
+    WHERE (SELECT COUNT(*) FROM market_listings) < 3
+  `);
+  await db.execute(sql`
+    INSERT INTO market_listings (crop_name, category, quantity, unit, price, location, description, phone, available)
+    SELECT 'Turmeric', 'spice', '50', 'kg', 95, 'Sangli, Maharashtra', 'Organic turmeric powder, high curcumin content.', '+91 98765 44444', true
+    WHERE (SELECT COUNT(*) FROM market_listings) < 4
+  `);
+  await db.execute(sql`
+    INSERT INTO market_listings (crop_name, category, quantity, unit, price, location, description, phone, available)
+    SELECT 'Chana Dal', 'pulse', '30', 'quintal', 4800, 'Indore, MP', 'Clean, sorted chana dal. Direct from farm.', '+91 98765 55555', true
+    WHERE (SELECT COUNT(*) FROM market_listings) < 5
+  `);
+  await db.execute(sql`
+    INSERT INTO market_listings (crop_name, category, quantity, unit, price, location, description, phone, available)
+    SELECT 'Onion', 'vegetable', '300', 'kg', 22, 'Lasalgaon, Maharashtra', 'Red onions, medium size, good for export.', '+91 98765 66666', true
+    WHERE (SELECT COUNT(*) FROM market_listings) < 6
+  `);
+
   console.log("Database migrated successfully");
 }

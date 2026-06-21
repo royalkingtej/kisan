@@ -7,9 +7,9 @@ interface HomePageProps {
 
 const FEATURES = [
   { icon: "🔬", title: "Disease Detection", desc: "AI-powered crop disease analysis from photos", path: "/disease", color: "#e8f5e9", border: "#a5d6a7" },
-  { icon: "💬", title: "Farming Chatbot", desc: "Get expert advice on farming & crop care", path: "/chat", color: "#e3f2fd", border: "#90caf9" },
-  { icon: "🚚", title: "Transport Service", desc: "Find vehicles & transport for your harvest", path: "/transport", color: "#fff3e0", border: "#ffcc80" },
-  { icon: "👤", title: "My Profile", desc: "Update your farm details and preferences", path: "/profile", color: "#fce4ec", border: "#f48fb1" },
+  { icon: "🛒", title: "Kisan Mandi", desc: "Buy & sell crops directly — no middlemen", path: "/market", color: "#fff8e1", border: "#ffe082" },
+  { icon: "🚚", title: "Transport", desc: "Find vehicles & transport for your harvest", path: "/transport", color: "#fff3e0", border: "#ffcc80" },
+  { icon: "💬", title: "AI Chatbot", desc: "Expert advice on farming & crop care", path: "/chat", color: "#e3f2fd", border: "#90caf9" },
 ];
 
 const TIPS = [

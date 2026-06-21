@@ -6,6 +6,7 @@ import { migrate } from "./migrate.js";
 import { registerAuthRoutes } from "./routes/auth.js";
 import { registerDiseaseRoutes } from "./routes/disease.js";
 import { registerTransportRoutes } from "./routes/transport.js";
+import { registerMarketRoutes } from "./routes/market.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,6 +18,7 @@ app.use(express.json({ limit: "20mb" }));
 registerAuthRoutes(app);
 registerDiseaseRoutes(app);
 registerTransportRoutes(app);
+registerMarketRoutes(app);
 
 const isProd = process.env.NODE_ENV === "production";
 const PORT = isProd ? 5000 : 3001;

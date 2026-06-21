@@ -7,6 +7,7 @@ import DiseaseDetectionPage from "./pages/DiseaseDetectionPage";
 import ChatPage from "./pages/ChatPage";
 import TransportPage from "./pages/TransportPage";
 import ProfilePage from "./pages/ProfilePage";
+import MarketplacePage from "./pages/MarketplacePage";
 
 export default function App() {
   const [user, setUser] = useState<any>(null);
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/" element={<HomePage user={user} />} />
           <Route path="/disease" element={<DiseaseDetectionPage user={user} />} />
           <Route path="/chat" element={<ChatPage user={user} />} />
+          <Route path="/market" element={<MarketplacePage user={user} />} />
           <Route path="/transport" element={<TransportPage user={user} />} />
           <Route path="/profile" element={<ProfilePage user={user} onUpdate={(u) => { setUser(u); }} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
