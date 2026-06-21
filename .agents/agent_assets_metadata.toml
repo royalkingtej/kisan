@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "b1KVFlAclsp7ljxDkNBb_"
+uri = "file://artifacts/kisan-setu/assets/images/icon.png"
+type = "image"
+title = "generated_image"
+
+[[generated]]
+id = "IzB_Ptn-Y26q0Nuoy19Ra"
+uri = "file://artifacts/kisan-setu/assets/images/hero-farm.png"
+type = "image"
+title = "generated_image"
