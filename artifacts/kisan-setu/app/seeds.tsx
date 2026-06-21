@@ -147,33 +147,37 @@ export default function SeedsScreen() {
 
   const filtered = selectedCategory === "All" ? SEEDS : SEEDS.filter((s) => s.category === selectedCategory);
 
+  const availColor = (avail: string) => {
+    if (avail === "High") return colors.success ?? "#2E7D32";
+    if (avail === "Medium") return colors.warning ?? "#FF8F00";
+    return colors.error ?? "#C62828";
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: "#33691E", paddingTop: isWeb ? 67 : insets.top + 12 }]}>
         <TouchableOpacity onPress={() => router.back()}>
           <Feather name="arrow-left" size={22} color="#fff" />
         </TouchableOpacity>
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>{tr("seeds")}</Text>
           <Text style={styles.headerSub}>{tr("seedsSubtitle")}</Text>
         </View>
         <Feather name="award" size={20} color="rgba(255,255,255,0.5)" />
       </View>
 
-      {/* Govt Certification Bodies */}
-      <View style={[styles.agencyRow, { backgroundColor: colors.card }]}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.agencyContent}>
-          {GOV_AGENCIES.map((ag) => (
-            <View key={ag.short} style={[styles.agencyChip, { backgroundColor: ag.color }]}>
-              <Feather name="shield" size={11} color="#fff" />
-              <Text style={styles.agencyShort}>{ag.short}</Text>
-            </View>
-          ))}
-          <Text style={[styles.agencyNote, { color: colors.mutedForeground }]}>Certifying Bodies</Text>
-        </ScrollView>
-      </View>
+      {/* Certifying bodies strip */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[styles.agencyStrip, { backgroundColor: colors.card }]} contentContainerStyle={styles.agencyContent}>
+        {GOV_AGENCIES.map((ag) => (
+          <View key={ag.short} style={[styles.agencyChip, { backgroundColor: ag.color }]}>
+            <Feather name="shield" size={11} color="#fff" />
+            <Text style={styles.agencyShort}>{ag.short}</Text>
+          </View>
+        ))}
+        <Text style={[styles.agencyNote, { color: colors.mutedForeground }]}>Certifying Bodies</Text>
+      </ScrollView>
 
-      {/* Filter */}
+      {/* Category filter */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={[styles.filterRow, { backgroundColor: colors.card }]} contentContainerStyle={styles.filterContent}>
         {CATEGORIES.map((cat) => (
           <TouchableOpacity
@@ -217,41 +221,35 @@ export default function SeedsScreen() {
                 <Feather name="calendar" size={12} color={colors.mutedForeground} />
                 <Text style={[styles.seedStatText, { color: colors.mutedForeground }]}>{seed.duration}</Text>
               </View>
-              <View style={[styles.seedStat, { backgroundColor: colors.muted }]}>
-                <Feather name="tag" size={12} color={colors.secondary} />
-                <Text style={[styles.seedStatText, { color: colors.secondary }]}>{seed.price}</Text>
+              <View style={[styles.seedStat, { backgroundColor: "#FF8F0015" }]}>
+                <Feather name="tag" size={12} color="#FF8F00" />
+                <Text style={[styles.seedStatText, { color: "#FF8F00" }]}>{seed.price}</Text>
               </View>
             </View>
 
             {expanded === seed.name && (
               <View style={styles.expandedSection}>
-                <View style={[styles.certBox, { backgroundColor: "#1B5E2010", borderColor: "#1B5E20" }]}>
-                  <Feather name="award" size={14} color="#1B5E20" />
+                <View style={[styles.certBox, { backgroundColor: "#1B5E2010", borderColor: "#1B5E2040" }]}>
+                  <Feather name="award" size={16} color="#1B5E20" />
                   <View>
                     <Text style={[styles.certBoxTitle, { color: "#1B5E20" }]}>Certification No.</Text>
                     <Text style={[styles.certBoxNo, { color: colors.foreground }]}>{seed.certNo}</Text>
                   </View>
                 </View>
 
-                <Text style={[styles.expandLabel, { color: colors.mutedForeground }]}>Key Features</Text>
+                <Text style={[styles.expandLabel, { color: colors.mutedForeground }]}>KEY FEATURES</Text>
                 {seed.features.map((f) => (
                   <View key={f} style={styles.featureRow}>
-                    <Feather name="check" size={13} color={seed.color} />
+                    <Feather name="check-circle" size={13} color={seed.color} />
                     <Text style={[styles.featureText, { color: colors.foreground }]}>{f}</Text>
                   </View>
                 ))}
 
-                <View style={styles.availRow}>
-                  <View style={[styles.availBadge, {
-                    backgroundColor: seed.availability === "High" ? colors.primary + "20" : seed.availability === "Medium" ? colors.warning + "20" : colors.error + "20"
-                  }]}>
-                    <View style={[styles.availDot, {
-                      backgroundColor: seed.availability === "High" ? colors.primary : seed.availability === "Medium" ? colors.warning : colors.error
-                    }]} />
-                    <Text style={[styles.availText, {
-                      color: seed.availability === "High" ? colors.primary : seed.availability === "Medium" ? colors.warning : colors.error
-                    }]}>Availability: {seed.availability}</Text>
-                  </View>
+                <View style={[styles.availBadge, { backgroundColor: availColor(seed.availability) + "20" }]}>
+                  <View style={[styles.availDot, { backgroundColor: availColor(seed.availability) }]} />
+                  <Text style={[styles.availText, { color: availColor(seed.availability) }]}>
+                    Availability: {seed.availability}
+                  </Text>
                 </View>
 
                 <TouchableOpacity style={[styles.orderBtn, { backgroundColor: seed.color }]}>
@@ -263,11 +261,11 @@ export default function SeedsScreen() {
           </TouchableOpacity>
         ))}
 
-        {/* Govt Portals */}
+        {/* Government portals */}
         <View style={[styles.portalsCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
           <Text style={[styles.portalsTitle, { color: colors.foreground }]}>Official Seed Portals</Text>
-          {GOV_AGENCIES.map((ag) => (
-            <View key={ag.name} style={[styles.portalRow, { borderBottomColor: colors.border }]}>
+          {GOV_AGENCIES.map((ag, idx) => (
+            <View key={ag.name} style={[styles.portalRow, { borderBottomColor: colors.border, borderBottomWidth: idx < GOV_AGENCIES.length - 1 ? 0.5 : 0 }]}>
               <View style={[styles.portalBadge, { backgroundColor: ag.color }]}>
                 <Text style={styles.portalBadgeText}>{ag.short}</Text>
               </View>
@@ -289,18 +287,17 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingBottom: 14,
-    gap: 10,
+    gap: 12,
   },
   headerTitle: { fontSize: 16, fontFamily: "Inter_700Bold", color: "#fff" },
   headerSub: { fontSize: 11, color: "rgba(255,255,255,0.75)", fontFamily: "Inter_400Regular" },
-  agencyRow: { paddingVertical: 8 },
-  agencyContent: { paddingHorizontal: 12, gap: 8, alignItems: "center" },
-  agencyChip: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 },
+  agencyStrip: { maxHeight: 44 },
+  agencyContent: { paddingHorizontal: 12, paddingVertical: 8, gap: 8, alignItems: "center" },
+  agencyChip: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   agencyShort: { color: "#fff", fontSize: 11, fontFamily: "Inter_700Bold" },
-  agencyNote: { fontSize: 11, fontFamily: "Inter_400Regular" },
+  agencyNote: { fontSize: 11, fontFamily: "Inter_400Regular", marginLeft: 4 },
   filterRow: { maxHeight: 48 },
   filterContent: { paddingHorizontal: 12, paddingVertical: 8, gap: 8 },
   chip: { paddingHorizontal: 14, paddingVertical: 5, borderRadius: 20 },
@@ -314,21 +311,25 @@ const styles = StyleSheet.create({
   seedName: { fontSize: 15, fontFamily: "Inter_700Bold", marginBottom: 2 },
   seedVariety: { fontSize: 11, fontFamily: "Inter_400Regular", marginBottom: 10 },
   seedStats: { flexDirection: "row", gap: 6 },
-  seedStat: { flex: 1, flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 8 },
+  seedStat: { flex: 1, flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 6, paddingVertical: 6, borderRadius: 8 },
   seedStatText: { fontSize: 10, fontFamily: "Inter_500Medium", flex: 1 },
-  expandedSection: { marginTop: 12, gap: 8 },
-  certBox: { flexDirection: "row", alignItems: "center", gap: 10, padding: 10, borderRadius: 10, borderWidth: 1 },
-  certBoxTitle: { fontSize: 10, fontFamily: "Inter_600SemiBold" },
-  certBoxNo: { fontSize: 12, fontFamily: "Inter_500Medium" },
-  expandLabel: { fontSize: 11, fontFamily: "Inter_600SemiBold", letterSpacing: 0.5 },
+  expandedSection: { marginTop: 12, gap: 10 },
+  certBox: { flexDirection: "row", alignItems: "center", gap: 10, padding: 12, borderRadius: 10, borderWidth: 1 },
+  certBoxTitle: { fontSize: 10, fontFamily: "Inter_600SemiBold", marginBottom: 2 },
+  certBoxNo: { fontSize: 13, fontFamily: "Inter_600SemiBold" },
+  expandLabel: { fontSize: 10, fontFamily: "Inter_600SemiBold", letterSpacing: 1 },
   featureRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   featureText: { fontSize: 13, fontFamily: "Inter_400Regular" },
-  availRow: { flexDirection: "row" },
-  availBadge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 10 },
+  availBadge: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, alignSelf: "flex-start" },
   availDot: { width: 7, height: 7, borderRadius: 3.5 },
-  availText: { fontSize: 12, fontFamily: "Inter_500Medium" },
-  orderBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 12, borderRadius: 10 },
+  availText: { fontSize: 12, fontFamily: "Inter_600SemiBold" },
+  orderBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 13, borderRadius: 12 },
   orderBtnText: { color: "#fff", fontSize: 14, fontFamily: "Inter_600SemiBold" },
   portalsCard: { borderRadius: 16, borderWidth: 1, padding: 14 },
   portalsTitle: { fontSize: 14, fontFamily: "Inter_600SemiBold", marginBottom: 12 },
-  
+  portalRow: { flexDirection: "row", alignItems: "center", paddingVertical: 10, gap: 12 },
+  portalBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
+  portalBadgeText: { color: "#fff", fontSize: 11, fontFamily: "Inter_700Bold" },
+  portalName: { fontSize: 12, fontFamily: "Inter_500Medium", marginBottom: 2 },
+  portalUrl: { fontSize: 11, fontFamily: "Inter_400Regular" },
+});

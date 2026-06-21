@@ -6,7 +6,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/inter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -14,15 +14,26 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { AppProvider } from "@/context/AppContext";
+import { AppProvider, useAppContext } from "@/context/AppContext";
 
 SplashScreen.preventAutoHideAsync();
 
 const queryClient = new QueryClient();
 
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { isLoggedIn } = useAppContext();
+  if (!isLoggedIn) {
+    return <Redirect href="/login" />;
+  }
+  return <>{children}</>;
+}
+
 function RootLayoutNav() {
+  const { isLoggedIn } = useAppContext();
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="login" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="weather" options={{ headerShown: false }} />
       <Stack.Screen name="calculator" options={{ headerShown: false }} />
@@ -34,8 +45,16 @@ function RootLayoutNav() {
       <Stack.Screen name="marketplace" options={{ headerShown: false }} />
       <Stack.Screen name="crop-intel" options={{ headerShown: false }} />
       <Stack.Screen name="land-market" options={{ headerShown: false }} />
+      <Stack.Screen name="seeds" options={{ headerShown: false }} />
+      <Stack.Screen name="irrigation" options={{ headerShown: false }} />
+      <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
     </Stack>
   );
+}
+
+function AppContent() {
+  const { isLoggedIn } = useAppContext();
+  return <RootLayoutNav />;
 }
 
 export default function RootLayout() {
@@ -61,7 +80,7 @@ export default function RootLayout() {
           <AppProvider>
             <GestureHandlerRootView style={{ flex: 1 }}>
               <KeyboardProvider>
-                <RootLayoutNav />
+                <AppContent />
               </KeyboardProvider>
             </GestureHandlerRootView>
           </AppProvider>
