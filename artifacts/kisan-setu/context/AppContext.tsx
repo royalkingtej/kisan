@@ -35,6 +35,7 @@ interface AppContextType {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   user: UserProfile;
+  updateUser: (updates: Partial<UserProfile>) => void;
   crops: Crop[];
   addCrop: (crop: Omit<Crop, "id">) => void;
   updateCrop: (id: string, updates: Partial<Crop>) => void;
@@ -42,9 +43,12 @@ interface AppContextType {
   notifications: number;
   showLanguagePicker: boolean;
   setShowLanguagePicker: (show: boolean) => void;
+  isLoggedIn: boolean;
+  login: (phone: string, name: string, state: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-const defaultUser: UserProfile = {
+const DEFAULT_USER: UserProfile = {
   name: "Rahul Singh",
   location: "Rural, Punjab",
   state: "Punjab",
@@ -58,37 +62,10 @@ const defaultUser: UserProfile = {
   phone: "+91 98765 43210",
 };
 
-const defaultCrops: Crop[] = [
-  {
-    id: "1",
-    name: "Wheat",
-    field: "F001",
-    plantingDate: "15/10/2025",
-    harvestDate: "20/03/2026",
-    quantity: 250,
-    status: "planted",
-    notes: "Good growth expected",
-  },
-  {
-    id: "2",
-    name: "Paddy",
-    field: "F002",
-    plantingDate: "10/06/2025",
-    harvestDate: "15/10/2025",
-    quantity: 180,
-    status: "harvested",
-    notes: "Excellent yield",
-  },
-  {
-    id: "3",
-    name: "Tomato",
-    field: "F003",
-    plantingDate: "01/01/2026",
-    harvestDate: "15/04/2026",
-    quantity: 80,
-    status: "planted",
-    notes: "Drip irrigation setup",
-  },
+const DEFAULT_CROPS: Crop[] = [
+  { id: "1", name: "Wheat", field: "F001", plantingDate: "15/10/2025", harvestDate: "20/03/2026", quantity: 250, status: "planted", notes: "Good growth expected" },
+  { id: "2", name: "Paddy", field: "F002", plantingDate: "10/06/2025", harvestDate: "15/10/2025", quantity: 180, status: "harvested", notes: "Excellent yield" },
+  { id: "3", name: "Tomato", field: "F003", plantingDate: "01/01/2026", harvestDate: "15/04/2026", quantity: 80, status: "planted", notes: "Drip irrigation setup" },
 ];
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -97,19 +74,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const systemColorScheme = useColorScheme();
   const [language, setLanguageState] = useState("en");
   const [isDarkMode, setIsDarkMode] = useState(systemColorScheme === "dark");
-  const [crops, setCrops] = useState<Crop[]>(defaultCrops);
+  const [crops, setCrops] = useState<Crop[]>(DEFAULT_CROPS);
   const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<UserProfile>(DEFAULT_USER);
   const notifications = 3;
 
   useEffect(() => {
     const loadPrefs = async () => {
       try {
-        const savedLang = await AsyncStorage.getItem("language");
-        const savedDark = await AsyncStorage.getItem("darkMode");
-        const savedCrops = await AsyncStorage.getItem("crops");
+        const [savedLang, savedDark, savedCrops, savedLogin, savedUser] = await Promise.all([
+          AsyncStorage.getItem("language"),
+          AsyncStorage.getItem("darkMode"),
+          AsyncStorage.getItem("crops"),
+          AsyncStorage.getItem("isLoggedIn"),
+          AsyncStorage.getItem("user"),
+        ]);
         if (savedLang) setLanguageState(savedLang);
         if (savedDark !== null) setIsDarkMode(savedDark === "true");
         if (savedCrops) setCrops(JSON.parse(savedCrops));
+        if (savedLogin === "true") setIsLoggedIn(true);
+        if (savedUser) setUser(JSON.parse(savedUser));
       } catch {}
     };
     loadPrefs();
@@ -128,9 +113,40 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const tr = useCallback((key: TranslationKey) => {
-    return getTranslation(language, key);
-  }, [language]);
+  const tr = useCallback((key: TranslationKey) => getTranslation(language, key), [language]);
+
+  const login = useCallback(async (phone: string, name: string, state: string) => {
+    const newUser: UserProfile = {
+      ...DEFAULT_USER,
+      phone,
+      name,
+      state,
+      location: `${state}, India`,
+    };
+    setUser(newUser);
+    setIsLoggedIn(true);
+    try {
+      await AsyncStorage.setItem("isLoggedIn", "true");
+      await AsyncStorage.setItem("user", JSON.stringify(newUser));
+    } catch {}
+  }, []);
+
+  const logout = useCallback(async () => {
+    setIsLoggedIn(false);
+    setUser(DEFAULT_USER);
+    try {
+      await AsyncStorage.removeItem("isLoggedIn");
+      await AsyncStorage.removeItem("user");
+    } catch {}
+  }, []);
+
+  const updateUser = useCallback(async (updates: Partial<UserProfile>) => {
+    setUser((prev) => {
+      const next = { ...prev, ...updates };
+      AsyncStorage.setItem("user", JSON.stringify(next)).catch(() => {});
+      return next;
+    });
+  }, []);
 
   const addCrop = useCallback((crop: Omit<Crop, "id">) => {
     const newCrop: Crop = { ...crop, id: Date.now().toString() };
@@ -158,23 +174,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AppContext.Provider
-      value={{
-        language,
-        setLanguage,
-        tr,
-        isDarkMode,
-        toggleDarkMode,
-        user: defaultUser,
-        crops,
-        addCrop,
-        updateCrop,
-        deleteCrop,
-        notifications,
-        showLanguagePicker,
-        setShowLanguagePicker,
-      }}
-    >
+    <AppContext.Provider value={{
+      language, setLanguage, tr,
+      isDarkMode, toggleDarkMode,
+      user, updateUser,
+      crops, addCrop, updateCrop, deleteCrop,
+      notifications,
+      showLanguagePicker, setShowLanguagePicker,
+      isLoggedIn, login, logout,
+    }}>
       {children}
     </AppContext.Provider>
   );
