@@ -7,6 +7,7 @@ import { registerAuthRoutes } from "./routes/auth.js";
 import { registerDiseaseRoutes } from "./routes/disease.js";
 import { registerTransportRoutes } from "./routes/transport.js";
 import { registerMarketRoutes } from "./routes/market.js";
+import { registerRoutes } from "./routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +20,7 @@ registerAuthRoutes(app);
 registerDiseaseRoutes(app);
 registerTransportRoutes(app);
 registerMarketRoutes(app);
+registerRoutes(app);
 
 const isProd = process.env.NODE_ENV === "production";
 const PORT = isProd ? 5000 : 3001;
