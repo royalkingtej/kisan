@@ -1,5 +1,5 @@
 import { BlurView } from "expo-blur";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
@@ -9,7 +9,11 @@ import { FloatingLanguageButton, LanguagePicker } from "@/components/LanguagePic
 
 function TabLayout() {
   const colors = useColors();
-  const { tr, isDarkMode } = useAppContext();
+  const { tr, isDarkMode, isLoggedIn } = useAppContext();
+
+  if (!isLoggedIn) {
+    return <Redirect href="/login" />;
+  }
   const isIOS = Platform.OS === "ios";
   const isWeb = Platform.OS === "web";
 
