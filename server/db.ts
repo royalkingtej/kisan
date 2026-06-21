@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import * as schema from "../shared/models/chat.js";
+import * as schema from "../shared/models/schema.js";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
