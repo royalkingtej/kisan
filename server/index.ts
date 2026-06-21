@@ -28,7 +28,7 @@ const PORT = isProd ? 5000 : 3001;
 if (isProd) {
   const distPath = path.join(__dirname, "../dist");
   app.use(express.static(distPath));
-  app.get("*", (_req, res) => {
+  app.get("/{*path}", (_req, res) => {
     res.sendFile(path.join(distPath, "index.html"));
   });
 }
